@@ -219,18 +219,26 @@
             
             /* sorting methods */
             scope.sortBy = function (col) {
-            	if (col.sortDirection === "asc") {
-            	   scope.treeData.sort(sort_by(col.field, true, col.sortingType));
-            	   col.sortDirection = "desc";
-       	           col.sortingIcon = attrs.sortedDesc;
-            	} else {
-            	   scope.treeData.sort(sort_by(col.field, false, col.sortingType));            		
-             	   col.sortDirection = "asc";
-        	       col.sortingIcon = attrs.sortedAsc;	
-            	}
-          	    col.sorted = true;
-                resetSorting(col);              
-              };       
+              function deepSort(parents, asc) {
+                parents.sort(sort_by(col.field, asc, col.sortingType));
+                parents.forEach(function (parent) {
+                  if('children' in parent) {
+                    deepSort(parent.children, asc);
+                  }
+                });
+              }
+              if (col.sortDirection === "asc") {
+                deepSort(scope.treeData, true);
+                col.sortDirection = "desc";
+                col.sortingIcon = attrs.sortedDesc;
+              } else {
+                deepSort(scope.treeData, false);
+                col.sortDirection = "asc";
+                col.sortingIcon = attrs.sortedAsc;
+              }
+              col.sorted = true;
+              resetSorting(col);
+            };       
 
             var sort_by = function(field, descending, sortingType){
                var key = sortingType === "number" ? function(x) {return parseFloat(x[field])} : function(x) {return (x[field] === null ? "" : x[field].toLowerCase())};
