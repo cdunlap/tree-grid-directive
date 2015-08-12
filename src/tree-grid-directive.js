@@ -241,7 +241,7 @@
             };       
 
             var sort_by = function(field, descending, sortingType){
-               var key = sortingType === "number" ? function(x) {return parseFloat(x[field])} : function(x) {return (x[field] === null ? "" : x[field].toLowerCase())};
+               var key = sortingType === "number" ? function(x) {return x[field] === null ? -1 : parseFloat(x[field]);} : function(x) {return (x[field] === null ? "" : x[field].toLowerCase())};
                var direction = !descending ? 1 : -1;
                return function (a, b) {
                    return a = key(a), b = key(b), direction * ((a > b) - (b > a));
